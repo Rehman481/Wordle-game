@@ -1,0 +1,251 @@
+/* src/components/Board.css - PROFESSIONAL / ANIMATED */
+
+.board-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 4px 0;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.board {
+  display: grid;
+  grid-template-rows: repeat(6, 1fr);
+  gap: 6px;
+  height: 100%;
+  width: auto;
+  max-width: 380px;
+  max-height: 380px;
+  aspect-ratio: 5 / 6.5;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+}
+
+/* ---------- Tile base ---------- */
+.tile {
+  aspect-ratio: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 2.2rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  border: 2px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  color: #FFFFFF;
+  transition: transform 0.12s ease, border-color 0.15s ease, background 0.15s ease;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* ---------- Active row: typing state ---------- */
+.row.active .tile {
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.row.active .tile:not(:empty) {
+  border-color: rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.07);
+  animation: tilePop 0.14s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes tilePop {
+  0%   { transform: scale(0.8); }
+  60%  { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+
+/* ---------- Submitted row: flip reveal ---------- */
+.row.filled .tile {
+  animation: tileFlip 0.55s ease forwards;
+}
+
+.row.filled .tile:nth-child(1) { animation-delay: 0s; }
+.row.filled .tile:nth-child(2) { animation-delay: 0.12s; }
+.row.filled .tile:nth-child(3) { animation-delay: 0.24s; }
+.row.filled .tile:nth-child(4) { animation-delay: 0.36s; }
+.row.filled .tile:nth-child(5) { animation-delay: 0.48s; }
+
+/* Flip: fold down to 90deg (still "blank" color), then unfold showing the
+   status color/gradient/shadow — matches real Wordle reveal timing */
+@keyframes tileFlip {
+  0% {
+    transform: rotateX(0deg);
+  }
+  45% {
+    transform: rotateX(90deg);
+  }
+  55% {
+    transform: rotateX(90deg);
+  }
+  100% {
+    transform: rotateX(0deg);
+  }
+}
+
+/* Apply status appearance only once the tile has folded past 90deg,
+   so the color "pops in" on the unfold half of the flip, not before */
+.row.filled .tile.correct,
+.row.filled .tile.present,
+.row.filled .tile.absent {
+  animation-name: tileFlip, statusReveal;
+  animation-duration: 0.55s, 0.01s;
+  animation-timing-function: ease, linear;
+  animation-fill-mode: forwards, forwards;
+}
+
+.row.filled .tile:nth-child(1).correct,
+.row.filled .tile:nth-child(1).present,
+.row.filled .tile:nth-child(1).absent { animation-delay: 0s, 0.25s; }
+
+.row.filled .tile:nth-child(2).correct,
+.row.filled .tile:nth-child(2).present,
+.row.filled .tile:nth-child(2).absent { animation-delay: 0.12s, 0.37s; }
+
+.row.filled .tile:nth-child(3).correct,
+.row.filled .tile:nth-child(3).present,
+.row.filled .tile:nth-child(3).absent { animation-delay: 0.24s, 0.49s; }
+
+.row.filled .tile:nth-child(4).correct,
+.row.filled .tile:nth-child(4).present,
+.row.filled .tile:nth-child(4).absent { animation-delay: 0.36s, 0.61s; }
+
+.row.filled .tile:nth-child(5).correct,
+.row.filled .tile:nth-child(5).present,
+.row.filled .tile:nth-child(5).absent { animation-delay: 0.48s, 0.73s; }
+
+@keyframes statusReveal {
+  to { opacity: 1; }
+}
+
+/* ---------- Status colors ---------- */
+.tile.correct {
+  background: linear-gradient(135deg, #00C9A7, #00A88A);
+  border-color: #00C9A7;
+  color: white;
+  box-shadow: 0 4px 20px rgba(0, 201, 167, 0.25);
+}
+
+.tile.present {
+  background: linear-gradient(135deg, #FFB347, #E69933);
+  border-color: #FFB347;
+  color: white;
+  box-shadow: 0 4px 20px rgba(255, 179, 71, 0.25);
+}
+
+.tile.absent {
+  background: linear-gradient(135deg, #787C7E, #5A5E60);
+  border-color: #787C7E;
+  color: white;
+  opacity: 0.75;
+}
+
+/* ---------- Optional: wrong-word shake ----------
+   Add className `row shake` (or toggle a `shake` class) from JS
+   for one animation cycle, e.g. on invalid submit. Remove the class
+   after ~400ms via setTimeout/state so it can replay next time. */
+.row.shake .tile {
+  animation: shake 0.4s ease;
+}
+
+@keyframes shake {
+  10%, 90% { transform: translateX(-2px); }
+  20%, 80% { transform: translateX(4px); }
+  30%, 50%, 70% { transform: translateX(-8px); }
+  40%, 60% { transform: translateX(8px); }
+}
+
+/* ---------- Optional: winning row bounce ----------
+   Add className `row win` to the completed correct row to trigger. */
+.row.win .tile {
+  animation: winBounce 0.6s ease;
+}
+
+.row.win .tile:nth-child(1) { animation-delay: 0s; }
+.row.win .tile:nth-child(2) { animation-delay: 0.08s; }
+.row.win .tile:nth-child(3) { animation-delay: 0.16s; }
+.row.win .tile:nth-child(4) { animation-delay: 0.24s; }
+.row.win .tile:nth-child(5) { animation-delay: 0.32s; }
+
+@keyframes winBounce {
+  0%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-18px); }
+  50% { transform: translateY(0); }
+  70% { transform: translateY(-8px); }
+  85% { transform: translateY(0); }
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 540px) {
+  .board {
+    max-width: 320px;
+    gap: 5px;
+    max-height: 320px;
+  }
+
+  .row {
+    gap: 5px;
+  }
+
+  .tile {
+    font-size: 1.8rem;
+    border-width: 1.5px;
+    border-radius: 6px;
+  }
+}
+
+@media (max-width: 440px) {
+  .board {
+    max-width: 270px;
+    gap: 4px;
+    max-height: 270px;
+  }
+
+  .row {
+    gap: 4px;
+  }
+
+  .tile {
+    font-size: 1.4rem;
+    border-width: 1.5px;
+    border-radius: 4px;
+  }
+}
+
+@media (max-width: 370px) {
+  .board {
+    max-width: 220px;
+    gap: 3px;
+    max-height: 220px;
+  }
+
+  .row {
+    gap: 3px;
+  }
+
+  .tile {
+    font-size: 1.1rem;
+    border-width: 1px;
+    border-radius: 3px;
+  }
+}
+
+/* Respect reduced-motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .tile,
+  .row.filled .tile,
+  .row.active .tile:not(:empty),
+  .row.shake .tile,
+  .row.win .tile {
+    animation: none !important;
+    transition: none !important;
+  }
+}

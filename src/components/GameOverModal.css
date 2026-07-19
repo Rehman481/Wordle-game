@@ -1,0 +1,238 @@
+/* src/components/GameOverModal.css - PROFESSIONAL / ANIMATED */
+
+/* ---------- Overlay ---------- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 1000;
+  padding: 20px;
+  animation: overlayFadeIn 0.25s ease forwards;
+}
+
+@keyframes overlayFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ---------- Modal card ---------- */
+.modal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+  max-width: 340px;
+  padding: 36px 28px 28px;
+  border-radius: 20px;
+  background: linear-gradient(180deg, #1E2124 0%, #17191B 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.02) inset;
+  transform: translateY(24px) scale(0.94);
+  opacity: 0;
+  animation: modalEnter 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.05s forwards;
+}
+
+@keyframes modalEnter {
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* ---------- Emoji ---------- */
+.result-emoji {
+  font-size: 3.2rem;
+  line-height: 1;
+  margin-bottom: 6px;
+  display: inline-block;
+  animation: emojiPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s backwards;
+}
+
+@keyframes emojiPop {
+  0%   { transform: scale(0) rotate(-15deg); opacity: 0; }
+  60%  { transform: scale(1.2) rotate(6deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+/* ---------- Heading ---------- */
+.modal h2 {
+  margin: 4px 0 2px;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #FFFFFF;
+  letter-spacing: -0.01em;
+  opacity: 0;
+  animation: fadeSlideUp 0.4s ease 0.4s forwards;
+}
+
+.subtitle {
+  margin: 4px 0 0;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.5);
+  opacity: 0;
+  animation: fadeSlideUp 0.4s ease 0.45s forwards;
+}
+
+@keyframes fadeSlideUp {
+  from { transform: translateY(8px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+/* ---------- Word reveal ---------- */
+.word-reveal {
+  margin: 14px 0 22px;
+  padding: 10px 24px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  opacity: 0;
+  animation: fadeSlideUp 0.4s ease 0.5s forwards;
+}
+
+.word-reveal strong {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, #00C9A7, #00A88A);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ---------- Stats ---------- */
+.stats {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  margin-bottom: 24px;
+  opacity: 0;
+  animation: fadeSlideUp 0.4s ease 0.55s forwards;
+}
+
+.stat-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 14px 8px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.stat-item:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.stat-item .number {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #FFFFFF;
+}
+
+.stat-item .label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+/* ---------- Buttons ---------- */
+.button-group {
+  width: 100%;
+  opacity: 0;
+  animation: fadeSlideUp 0.4s ease 0.6s forwards;
+}
+
+.restart-btn {
+  width: 100%;
+  padding: 14px 0;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: #0D1210;
+  background: linear-gradient(135deg, #00E3B4, #00C9A7);
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(0, 201, 167, 0.3);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+}
+
+.restart-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 26px rgba(0, 201, 167, 0.4);
+  filter: brightness(1.05);
+}
+
+.restart-btn:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 4px 14px rgba(0, 201, 167, 0.3);
+}
+
+.restart-btn:focus-visible {
+  outline: 2px solid #00E3B4;
+  outline-offset: 3px;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 400px) {
+  .modal {
+    padding: 30px 22px 24px;
+    max-width: 300px;
+    border-radius: 16px;
+  }
+
+  .result-emoji {
+    font-size: 2.6rem;
+  }
+
+  .modal h2 {
+    font-size: 1.35rem;
+  }
+
+  .word-reveal strong {
+    font-size: 1.25rem;
+  }
+
+  .stat-item .number {
+    font-size: 1.2rem;
+  }
+
+  .restart-btn {
+    padding: 12px 0;
+    font-size: 0.95rem;
+  }
+}
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .modal-overlay,
+  .modal,
+  .result-emoji,
+  .modal h2,
+  .subtitle,
+  .word-reveal,
+  .stats,
+  .button-group,
+  .stat-item,
+  .restart-btn {
+    animation: none !important;
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

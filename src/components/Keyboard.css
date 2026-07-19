@@ -1,0 +1,158 @@
+/* src/components/Keyboard.css - PROFESSIONAL / ANIMATED */
+
+.keyboard {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 8px 6px 4px;
+  user-select: none;
+}
+
+.keyboard-row {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+
+/* ---------- Key base ---------- */
+.key {
+  flex: 1;
+  max-width: 43px;
+  height: 52px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.09);
+  color: #FFFFFF;
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform 0.08s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.key:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.key:active:not(:disabled) {
+  transform: scale(0.9);
+}
+
+/* Press feedback ripple-ish pop on click, reusable via :active above.
+   Also give a quick tap animation using :focus for keyboard users. */
+.key:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.5);
+  outline-offset: 2px;
+}
+
+.key:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* ---------- Special keys (Enter / Backspace) ---------- */
+.key.special {
+  flex: 1.6;
+  max-width: 68px;
+  font-size: 1.1rem;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.key.special:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* ---------- Status colors (animated transition into place) ---------- */
+.key.correct,
+.key.present,
+.key.absent {
+  animation: keyStatusIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  color: white;
+}
+
+@keyframes keyStatusIn {
+  0%   { transform: scale(0.85); }
+  60%  { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
+.key.correct {
+  background: linear-gradient(135deg, #00C9A7, #00A88A);
+  box-shadow: 0 3px 10px rgba(0, 201, 167, 0.3);
+}
+
+.key.correct:hover:not(:disabled) {
+  background: linear-gradient(135deg, #10D6B4, #00B896);
+}
+
+.key.present {
+  background: linear-gradient(135deg, #FFB347, #E69933);
+  box-shadow: 0 3px 10px rgba(255, 179, 71, 0.3);
+}
+
+.key.present:hover:not(:disabled) {
+  background: linear-gradient(135deg, #FFC066, #F2A643);
+}
+
+.key.absent {
+  background: linear-gradient(135deg, #787C7E, #5A5E60);
+  opacity: 0.65;
+}
+
+.key.absent:hover:not(:disabled) {
+  opacity: 0.75;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 480px) {
+  .keyboard {
+    gap: 6px;
+    padding: 6px 3px 2px;
+  }
+
+  .keyboard-row {
+    gap: 4px;
+  }
+
+  .key {
+    height: 46px;
+    max-width: 34px;
+    font-size: 0.8rem;
+    border-radius: 6px;
+  }
+
+  .key.special {
+    max-width: 50px;
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .key {
+    height: 42px;
+    max-width: 28px;
+    font-size: 0.7rem;
+  }
+
+  .key.special {
+    max-width: 42px;
+    font-size: 0.85rem;
+  }
+}
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .key,
+  .key.correct,
+  .key.present,
+  .key.absent {
+    animation: none !important;
+    transition: none !important;
+  }
+}
