@@ -11,7 +11,7 @@ import './App.css'
 function App() {
   const [solution, setSolution] = useState('')
   const [guesses, setGuesses] = useState([])
-  const [currentGuess, setCurrentGuess] = useState('')
+  const [currentGuess, setCurrentGuess] = useState(Array(5).fill(''))
   const [gameOver, setGameOver] = useState(false)
   const [won, setWon] = useState(false)
   const [keyStatuses, setKeyStatuses] = useState({})
@@ -20,9 +20,8 @@ function App() {
 
   // HINT SYSTEM STATE
   const [hintUsed, setHintUsed] = useState(false)
-  const [hintLetter, setHintLetter] = useState('')
-  const [hintPosition, setHintPosition] = useState(-1)
-  const [hintRevealed, setHintRevealed] = useState(false)
+  const [lockedHintIndex, setLockedHintIndex] = useState(-1)
+  const [lockedHintLetter, setLockedHintLetter] = useState('')
 
   // TIMER STATE
   const [timeLeft, setTimeLeft] = useState(120)
@@ -43,16 +42,15 @@ function App() {
   // Reset hint state
   const resetHintState = () => {
     setHintUsed(false)
-    setHintLetter('')
-    setHintPosition(-1)
-    setHintRevealed(false)
+    setLockedHintIndex(-1)
+    setLockedHintLetter('')
   }
 
   // Timer logic
   useEffect(() => {
     if (timerActive && timeLeft > 0 && !gameOver && gameStarted) {
       const timer = setTimeout(() => {
-        setTimeLeft(timeLeft - 1)
+        setTimeLeft(prev => prev - 1)
       }, 1000)
       return () => clearTimeout(timer)
     } else if (timeLeft === 0 && !gameOver && gameStarted) {
@@ -84,7 +82,7 @@ function App() {
     const newWord = WORDS[Math.floor(Math.random() * WORDS.length)]
     setSolution(newWord)
     setGuesses([])
-    setCurrentGuess('')
+    setCurrentGuess(Array(5).fill(''))
     setGameOver(false)
     setWon(false)
     setKeyStatuses({})
@@ -117,7 +115,7 @@ function App() {
 
     const availablePositions = []
     for (let i = 0; i < 5; i++) {
-      if (!correctPositions.has(i) && i !== hintPosition) {
+      if (!correctPositions.has(i) && i !== lockedHintIndex) {
         let alreadyCorrect = false
         guesses.forEach(guess => {
           if (guess[i] && guess[i].letter === solutionArr[i] && guess[i].status === 'correct') {
@@ -136,7 +134,7 @@ function App() {
     return availablePositions[randomIndex]
   }
 
-  // Handle hint usage
+  // Handle hint usage - SIMPLIFIED
   const handleHint = () => {
     if (hintUsed || gameOver || guesses.length < 3) return
     if (guesses.length >= 6) return
@@ -146,24 +144,13 @@ function App() {
 
     const letter = solution[position]
     
-    // Build guess with hint letter
-    let guessArray = currentGuess.split('')
-    while (guessArray.length < 5) {
-      guessArray.push('')
-    }
+    const guessArray = [...currentGuess]
     guessArray[position] = letter
-    
-    // Remove trailing empty strings
-    let newGuess = guessArray.join('')
-    while (newGuess.endsWith('') || newGuess.endsWith(' ')) {
-      newGuess = newGuess.slice(0, -1)
-    }
-    
-    setHintLetter(letter)
-    setHintPosition(position)
+
+    setLockedHintIndex(position)
+    setLockedHintLetter(letter)
     setHintUsed(true)
-    setHintRevealed(true)
-    setCurrentGuess(newGuess)
+    setCurrentGuess(guessArray)
   }
 
   const evaluateGuess = (guess) => {
@@ -214,97 +201,73 @@ function App() {
     setTimeout(() => setShake(false), 500)
   }
 
-  // ========== FIXED handleKeyPress ==========
+  const getFirstEditableIndex = (guessArray) => {
+    for (let i = 0; i < 5; i++) {
+      if (i === lockedHintIndex) continue
+      if (!guessArray[i]) return i
+    }
+    return -1
+  }
+
+  // ========== SIMPLIFIED handleKeyPress ==========
   const handleKeyPress = useCallback((key) => {
     if (gameOver || !gameStarted) return
     setErrorMessage('')
 
     if (key === 'ENTER') {
-      if (currentGuess.length !== 5) {
+      const guessWord = currentGuess.join('').toUpperCase()
+
+      if (guessWord.length !== 5) {
         setErrorMessage('⚠️ Need exactly 5 letters!')
         triggerShake()
         return
       }
 
-      if (!WORDS.includes(currentGuess)) {
-        setErrorMessage(`❌ "${currentGuess}" is not a valid word!`)
+      if (!WORDS.includes(guessWord)) {
+        setErrorMessage(`❌ "${guessWord}" is not a valid word!`)
         triggerShake()
         return
       }
 
-      const evaluated = evaluateGuess(currentGuess)
-      setGuesses(prevGuesses => [...prevGuesses, evaluated])
+      const evaluated = evaluateGuess(guessWord)
+      setGuesses(prev => [...prev, evaluated])
       updateKeyStatuses(evaluated)
-      setCurrentGuess('')
+      setCurrentGuess(Array(5).fill(''))
+      setLockedHintIndex(-1)
+      setLockedHintLetter('')
       return
     }
 
     if (key === 'BACK') {
-      const guessArray = currentGuess.split('')
-      
-      // Find the last editable position (skip hint position)
-      let lastIndex = -1
-      for (let i = guessArray.length - 1; i >= 0; i--) {
-        if (i !== hintPosition && guessArray[i] && guessArray[i] !== ' ') {
-          lastIndex = i
+      const guessArray = [...currentGuess]
+      let removeIndex = -1
+
+      for (let i = 4; i >= 0; i--) {
+        if (i === lockedHintIndex) continue
+        if (guessArray[i]) {
+          removeIndex = i
           break
         }
       }
-      
-      if (lastIndex === -1) {
-        // If no editable letters, clear everything except hint
-        if (hintPosition !== -1 && hintRevealed) {
-          const newArray = Array(5).fill('')
-          newArray[hintPosition] = hintLetter
-          setCurrentGuess(newArray.join('').trimEnd())
-        } else {
-          setCurrentGuess('')
-        }
-      } else {
-        // Remove the letter at lastIndex
-        const newArray = guessArray.map((char, idx) => {
-          if (idx === lastIndex) return ''
-          return char
-        })
-        const cleaned = newArray.filter(char => char !== '').join('')
-        setCurrentGuess(cleaned)
-      }
+
+      if (removeIndex === -1) return
+
+      guessArray[removeIndex] = ''
+      setCurrentGuess(guessArray)
       return
     }
 
-    if (currentGuess.length < 5 && key.match(/[A-Za-z]/)) {
+    if (key.match(/^[A-Za-z]$/)) {
       const upperKey = key.toUpperCase()
-      
-      // Create an array of the current guess (pad to 5)
-      let guessArray = currentGuess.split('')
-      while (guessArray.length < 5) {
-        guessArray.push('')
-      }
-      
-      // Find the first empty position (skip hint position)
-      let insertIndex = -1
-      for (let i = 0; i < 5; i++) {
-        if (i === hintPosition) continue
-        if (!guessArray[i] || guessArray[i] === '') {
-          insertIndex = i
-          break
-        }
-      }
-      
+      const guessArray = [...currentGuess]
+      const insertIndex = getFirstEditableIndex(guessArray)
+
       if (insertIndex === -1) return
-      
-      // Insert the letter
+
       guessArray[insertIndex] = upperKey
-      
-      // Remove trailing empty strings
-      let newGuess = guessArray.join('')
-      while (newGuess.endsWith('') || newGuess.endsWith(' ')) {
-        newGuess = newGuess.slice(0, -1)
-      }
-      
-      setCurrentGuess(newGuess)
+      setCurrentGuess(guessArray)
     }
-  }, [currentGuess, gameOver, hintPosition, hintRevealed, hintLetter, gameStarted])
+  }, [currentGuess, gameOver, lockedHintIndex, gameStarted])
 
   // Keyboard event listener
   useEffect(() => {
@@ -370,11 +333,9 @@ function App() {
       <Board 
         guesses={guesses}
         currentGuess={currentGuess}
-        solution={solution}
         gameOver={gameOver}
-        hintPosition={hintPosition}
-        hintLetter={hintLetter}
-        hintRevealed={hintRevealed}
+        lockedHintIndex={lockedHintIndex}
+        lockedHintLetter={lockedHintLetter}
       />
 
       <Keyboard 

@@ -5,11 +5,9 @@ import './Board.css'
 const Board = ({ 
   guesses, 
   currentGuess, 
-  solution, 
   gameOver,
-  hintPosition,
-  hintLetter,
-  hintRevealed
+  lockedHintIndex,
+  lockedHintLetter
 }) => {
   const boardRef = useRef(null)
 
@@ -23,13 +21,6 @@ const Board = ({
     if (rowIndex < guesses.length) return 'filled'
     if (rowIndex === guesses.length && !gameOver) return 'active'
     return ''
-  }
-
-  const isHintTile = (rowIndex, colIndex) => {
-    return rowIndex === guesses.length && 
-           colIndex === hintPosition && 
-           hintRevealed && 
-           !gameOver
   }
 
   return (
@@ -51,14 +42,8 @@ const Board = ({
                   letter = guess[colIndex].letter
                   status = guess[colIndex].status
                 } else if (isActive) {
-                  // Check if this is a hint tile
-                  if (colIndex === hintPosition && hintRevealed) {
-                    letter = hintLetter
-                    isHint = true
-                    status = 'hint'
-                  } else {
-                    letter = currentGuess[colIndex] || ''
-                  }
+                  letter = currentGuess[colIndex] || ''
+                  isHint = colIndex === lockedHintIndex && Boolean(lockedHintLetter)
                 }
 
                 return (
