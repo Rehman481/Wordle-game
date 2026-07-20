@@ -1,4 +1,4 @@
-// src/App.jsx
+// src/App.jsx - COMPLETE FIXED VERSION
 import { useState, useEffect, useCallback } from 'react'
 import Board from './components/Board'
 import Keyboard from './components/Keyboard'
@@ -24,13 +24,13 @@ function App() {
   const [hintPosition, setHintPosition] = useState(-1)
   const [hintRevealed, setHintRevealed] = useState(false)
 
-  // TIMER STATE - 2 MINUTES (120 seconds)
+  // TIMER STATE
   const [timeLeft, setTimeLeft] = useState(120)
   const [timerActive, setTimerActive] = useState(false)
   const [showRules, setShowRules] = useState(true)
   const [gameStarted, setGameStarted] = useState(false)
 
-  // Initialize game - DON'T start timer yet
+  // Initialize game
   useEffect(() => {
     const randomWord = WORDS[Math.floor(Math.random() * WORDS.length)]
     setSolution(randomWord)
@@ -48,7 +48,7 @@ function App() {
     setHintRevealed(false)
   }
 
-  // Timer logic - ONLY runs when timerActive is true AND gameStarted is true
+  // Timer logic
   useEffect(() => {
     if (timerActive && timeLeft > 0 && !gameOver && gameStarted) {
       const timer = setTimeout(() => {
@@ -96,7 +96,6 @@ function App() {
     setShowRules(true)
   }
 
-  // Start game when "Let's Play!" is clicked
   const startGame = () => {
     setShowRules(false)
     setGameStarted(true)
@@ -147,9 +146,18 @@ function App() {
 
     const letter = solution[position]
     
-    let newGuess = currentGuess.padEnd(5, ' ').split('')
-    newGuess[position] = letter
-    newGuess = newGuess.join('').trimEnd()
+    // Build guess with hint letter
+    let guessArray = currentGuess.split('')
+    while (guessArray.length < 5) {
+      guessArray.push('')
+    }
+    guessArray[position] = letter
+    
+    // Remove trailing empty strings
+    let newGuess = guessArray.join('')
+    while (newGuess.endsWith('') || newGuess.endsWith(' ')) {
+      newGuess = newGuess.slice(0, -1)
+    }
     
     setHintLetter(letter)
     setHintPosition(position)
@@ -206,6 +214,7 @@ function App() {
     setTimeout(() => setShake(false), 500)
   }
 
+  // ========== FIXED handleKeyPress ==========
   const handleKeyPress = useCallback((key) => {
     if (gameOver || !gameStarted) return
     setErrorMessage('')
@@ -232,31 +241,51 @@ function App() {
 
     if (key === 'BACK') {
       const guessArray = currentGuess.split('')
+      
+      // Find the last editable position (skip hint position)
       let lastIndex = -1
       for (let i = guessArray.length - 1; i >= 0; i--) {
-        if (i !== hintPosition) {
+        if (i !== hintPosition && guessArray[i] && guessArray[i] !== ' ') {
           lastIndex = i
           break
         }
       }
       
       if (lastIndex === -1) {
-        setCurrentGuess('')
+        // If no editable letters, clear everything except hint
+        if (hintPosition !== -1 && hintRevealed) {
+          const newArray = Array(5).fill('')
+          newArray[hintPosition] = hintLetter
+          setCurrentGuess(newArray.join('').trimEnd())
+        } else {
+          setCurrentGuess('')
+        }
       } else {
-        const newGuess = guessArray.filter((_, idx) => idx !== lastIndex).join('')
-        setCurrentGuess(newGuess)
+        // Remove the letter at lastIndex
+        const newArray = guessArray.map((char, idx) => {
+          if (idx === lastIndex) return ''
+          return char
+        })
+        const cleaned = newArray.filter(char => char !== '').join('')
+        setCurrentGuess(cleaned)
       }
       return
     }
 
     if (currentGuess.length < 5 && key.match(/[A-Za-z]/)) {
       const upperKey = key.toUpperCase()
-      const guessArray = currentGuess.split('')
       
+      // Create an array of the current guess (pad to 5)
+      let guessArray = currentGuess.split('')
+      while (guessArray.length < 5) {
+        guessArray.push('')
+      }
+      
+      // Find the first empty position (skip hint position)
       let insertIndex = -1
       for (let i = 0; i < 5; i++) {
         if (i === hintPosition) continue
-        if (!guessArray[i] || guessArray[i] === ' ') {
+        if (!guessArray[i] || guessArray[i] === '') {
           insertIndex = i
           break
         }
@@ -264,11 +293,18 @@ function App() {
       
       if (insertIndex === -1) return
       
+      // Insert the letter
       guessArray[insertIndex] = upperKey
-      const newGuess = guessArray.join('').trimEnd()
+      
+      // Remove trailing empty strings
+      let newGuess = guessArray.join('')
+      while (newGuess.endsWith('') || newGuess.endsWith(' ')) {
+        newGuess = newGuess.slice(0, -1)
+      }
+      
       setCurrentGuess(newGuess)
     }
-  }, [currentGuess, gameOver, hintPosition, gameStarted])
+  }, [currentGuess, gameOver, hintPosition, hintRevealed, hintLetter, gameStarted])
 
   // Keyboard event listener
   useEffect(() => {
@@ -296,14 +332,12 @@ function App() {
 
   const shouldShowHint = guesses.length >= 3 && !gameOver && !hintUsed && guesses.length < 6 && gameStarted
 
-  // Format timer (MM:SS)
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60)
     const secs = seconds % 60
     return `${mins}:${secs.toString().padStart(2, '0')}`
   }
 
-  // Timer color based on time left
   const getTimerColor = () => {
     if (timeLeft <= 10) return 'timer-danger'
     if (timeLeft <= 30) return 'timer-warning'
@@ -316,15 +350,11 @@ function App() {
         <h1>Wordle</h1>
       </header>
 
-      {/* Game Info: Timer + Rules Button */}
       <div className="game-info">
         <div className={`timer ${getTimerColor()}`}>
           ⏱️ {formatTime(timeLeft)}
         </div>
-        <button 
-          className="rules-btn"
-          onClick={() => setShowRules(true)}
-        >
+        <button className="rules-btn" onClick={() => setShowRules(true)}>
           📖 Rules
         </button>
       </div>
@@ -365,7 +395,6 @@ function App() {
         />
       )}
 
-      {/* Rules Modal - shows on first load */}
       {showRules && (
         <RulesModal 
           isOpen={showRules}
