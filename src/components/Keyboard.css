@@ -113,3 +113,135 @@
 }
 
 }
+/* ============================================================
+   HINT BUTTON (Add to Keyboard.css)
+   ============================================================ */
+
+.keyboard-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+/* Hint row - below keyboard */
+.hint-row {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: 8px;
+  padding: 2px 0;
+}
+
+/* Hint button - blue glow theme */
+.hint-btn {
+  padding: 8px 24px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(79, 195, 247, 0.12), rgba(41, 182, 246, 0.05));
+  color: #4FC3F7;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  border: 1px solid rgba(79, 195, 247, 0.2);
+  letter-spacing: 0.04em;
+  box-shadow: 0 0 20px rgba(79, 195, 247, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  animation: hintBtnPulse 2s ease-in-out infinite;
+  min-width: 120px;
+}
+
+/* Hint button hover state */
+.hint-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(79, 195, 247, 0.25), rgba(41, 182, 246, 0.1));
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 4px 24px rgba(79, 195, 247, 0.25);
+  border-color: rgba(79, 195, 247, 0.4);
+}
+
+/* Hint button active state */
+.hint-btn:active:not(:disabled) {
+  transform: scale(0.95) translateY(0);
+  box-shadow: none;
+  transition-duration: 0.05s;
+}
+
+/* Hint button used state (disabled) */
+.hint-btn.used {
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.05);
+  cursor: not-allowed;
+  animation: none;
+  box-shadow: none;
+}
+
+.hint-btn.used:hover {
+  transform: none;
+  box-shadow: none;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+/* Hint button pulse animation */
+@keyframes hintBtnPulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(79, 195, 247, 0.05);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(79, 195, 247, 0.15);
+  }
+}
+
+/* Hint button icon */
+.hint-btn .hint-icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* Responsive hint button - Tablet */
+@media (max-width: 540px) {
+  .hint-row {
+    margin-top: 6px;
+  }
+  .hint-btn {
+    padding: 6px 18px;
+    font-size: 0.7rem;
+    min-width: 100px;
+    border-radius: 8px;
+  }
+  .hint-btn .hint-icon {
+    font-size: 0.85rem;
+  }
+}
+
+/* Responsive hint button - Mobile */
+@media (max-width: 440px) {
+  .hint-row {
+    margin-top: 4px;
+  }
+  .hint-btn {
+    padding: 5px 14px;
+    font-size: 0.65rem;
+    min-width: 80px;
+    border-radius: 6px;
+    gap: 5px;
+  }
+  .hint-btn .hint-icon {
+    font-size: 0.75rem;
+  }
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .hint-btn {
+    animation: none !important;
+  }
+  .hint-btn:hover:not(:disabled) {
+    transform: none !important;
+  }
+}

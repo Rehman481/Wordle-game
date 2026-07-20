@@ -2,7 +2,15 @@
 import { useEffect, useRef } from 'react'
 import './Board.css'
 
-const Board = ({ guesses, currentGuess, solution, gameOver }) => {
+const Board = ({ 
+  guesses, 
+  currentGuess, 
+  solution, 
+  gameOver,
+  hintPosition,
+  hintLetter,
+  hintRevealed
+}) => {
   const boardRef = useRef(null)
 
   useEffect(() => {
@@ -15,6 +23,13 @@ const Board = ({ guesses, currentGuess, solution, gameOver }) => {
     if (rowIndex < guesses.length) return 'filled'
     if (rowIndex === guesses.length && !gameOver) return 'active'
     return ''
+  }
+
+  const isHintTile = (rowIndex, colIndex) => {
+    return rowIndex === guesses.length && 
+           colIndex === hintPosition && 
+           hintRevealed && 
+           !gameOver
   }
 
   return (
@@ -30,18 +45,27 @@ const Board = ({ guesses, currentGuess, solution, gameOver }) => {
               {[...Array(5)].map((_, colIndex) => {
                 let letter = ''
                 let status = ''
+                let isHint = false
 
                 if (isFilled && guess) {
                   letter = guess[colIndex].letter
                   status = guess[colIndex].status
                 } else if (isActive) {
-                  letter = currentGuess[colIndex] || ''
+                  // Check if this is a hint tile
+                  if (colIndex === hintPosition && hintRevealed) {
+                    letter = hintLetter
+                    isHint = true
+                    status = 'hint'
+                  } else {
+                    letter = currentGuess[colIndex] || ''
+                  }
                 }
 
                 return (
                   <div 
                     key={colIndex} 
-                    className={`tile ${status}`}
+                    className={`tile ${status} ${isHint ? 'hint-tile' : ''}`}
+                    data-hint={isHint ? 'true' : 'false'}
                   >
                     {letter}
                   </div>

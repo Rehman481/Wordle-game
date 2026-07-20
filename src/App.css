@@ -169,3 +169,67 @@ body {
   }
 
 }
+/* ==============================
+   Timer & Hint
+============================== */
+
+.game-info {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.timer {
+  padding: 8px 16px;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 10px;
+  color: white;
+  font-weight: 700;
+  font-size: .95rem;
+}
+
+.hint-btn {
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 10px;
+  background: linear-gradient(135deg,#ffb347,#ff9800);
+  color: white;
+  font-weight: bold;
+  transition: .25s;
+}
+
+.hint-btn:hover {
+  transform: scale(1.05);
+}
+
+.hint-btn:active {
+  transform: scale(.95);
+}
+
+.hint-box {
+  width: 100%;
+  margin-bottom: 8px;
+  text-align: center;
+  padding: 10px;
+  border-radius: 10px;
+  color: #FFD54F;
+  background: rgba(255,179,71,.12);
+  border: 1px solid rgba(255,179,71,.35);
+  animation: hintFade .35s ease;
+}
+
+@keyframes hintFade {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

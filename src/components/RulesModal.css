@@ -1,303 +1,449 @@
-/* src/components/RulesModal.css - PROFESSIONAL / ANIMATED */
+/* src/components/RulesModal.css */
 
-/* ---------- Overlay (shared look with GameOverModal) ---------- */
-.modal-overlay {
+/* ========== OVERLAY ========== */
+.rules-overlay {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   display: flex;
   justify-content: center;
   align-items: center;
-  background: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  z-index: 1000;
+  z-index: 2000;
   padding: 20px;
-  animation: overlayFadeIn 0.25s ease forwards;
+  animation: rulesFadeIn 0.35s ease;
 }
 
-@keyframes overlayFadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-/* ---------- Modal card ---------- */
-.modal {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  width: 100%;
-  max-width: 340px;
-  padding: 36px 28px 28px;
-  border-radius: 20px;
-  background: linear-gradient(180deg, #1E2124 0%, #17191B 100%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow:
-    0 20px 60px rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(255, 255, 255, 0.02) inset;
-  transform: translateY(24px) scale(0.94);
-  opacity: 0;
-  animation: modalEnter 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.05s forwards;
-}
-
-@keyframes modalEnter {
+@keyframes rulesFadeIn {
+  from {
+    opacity: 0;
+  }
   to {
-    transform: translateY(0) scale(1);
     opacity: 1;
   }
 }
 
-/* Rules modal is content-heavy, allow it a bit more room + internal scroll
-   on very short viewports instead of overflowing the screen */
+/* ========== MODAL ========== */
 .rules-modal {
-  max-width: 380px;
+  background: linear-gradient(145deg, #1A1D20, #22262A);
+  border-radius: 24px;
+  padding: 36px 40px 32px;
+  max-width: 460px;
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6), 0 0 60px rgba(0, 201, 167, 0.03);
+  animation: rulesSlideUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
   max-height: 90vh;
-  max-height: 90dvh;
   overflow-y: auto;
 }
 
-/* ---------- Emoji ---------- */
-.rules-emoji {
-  font-size: 3rem;
-  line-height: 1;
-  margin-bottom: 6px;
-  display: inline-block;
-  animation: emojiPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s backwards;
+@keyframes rulesSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
-@keyframes emojiPop {
-  0%   { transform: scale(0) rotate(-15deg); opacity: 0; }
-  60%  { transform: scale(1.2) rotate(6deg); opacity: 1; }
-  100% { transform: scale(1) rotate(0deg); }
+/* Custom scrollbar */
+.rules-modal::-webkit-scrollbar {
+  width: 4px;
 }
 
-/* ---------- Heading / subtitle (shared naming with GameOverModal) ---------- */
-.modal h2 {
-  margin: 4px 0 2px;
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: #FFFFFF;
-  letter-spacing: -0.01em;
-  opacity: 0;
-  animation: fadeSlideUp 0.4s ease 0.4s forwards;
+.rules-modal::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-.subtitle {
-  margin: 4px 0 0;
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.5);
-  opacity: 0;
-  animation: fadeSlideUp 0.4s ease 0.45s forwards;
+.rules-modal::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 2px;
 }
 
-@keyframes fadeSlideUp {
-  from { transform: translateY(8px); opacity: 0; }
-  to   { transform: translateY(0); opacity: 1; }
-}
-
-/* ---------- Rules list ---------- */
-.rules-list {
-  width: 100%;
-  margin: 16px 0 4px;
-  padding: 0;
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  text-align: left;
-  opacity: 0;
-  animation: fadeSlideUp 0.4s ease 0.5s forwards;
-}
-
-.rules-list li {
-  position: relative;
-  padding-left: 20px;
-  font-size: 0.85rem;
-  line-height: 1.4;
-  color: rgba(255, 255, 255, 0.75);
-}
-
-.rules-list li::before {
-  content: '';
+/* ========== CLOSE BUTTON ========== */
+.rules-close {
   position: absolute;
-  left: 0;
-  top: 7px;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #00C9A7;
+  top: 14px;
+  right: 18px;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 1.3rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  padding: 4px 10px;
+  border-radius: 8px;
+  line-height: 1;
 }
 
-.rules-list li strong {
+.rules-close:hover {
   color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.06);
+  transform: rotate(90deg);
 }
 
-/* ---------- Tile-color examples ---------- */
-.rules-examples {
-  width: 100%;
+/* ========== HEADER ========== */
+.rules-modal h2 {
+  font-size: 1.8rem;
+  font-weight: 800;
+  text-align: center;
+  margin: 0 0 18px;
+  background: linear-gradient(135deg, #00E3B4, #00C9A7, #4FC3F7);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  letter-spacing: 0.02em;
+}
+
+/* ========== CONTENT ========== */
+.rules-content {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+
+.rules-intro {
+  text-align: center;
+  font-size: 1.05rem;
+  margin: 0 0 16px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.rules-intro strong {
+  color: #4FC3F7;
+}
+
+/* ========== RULE EXAMPLES ========== */
+.rule-examples {
+  margin: 14px 0 16px;
   display: flex;
   flex-direction: column;
+  gap: 10px;
+}
+
+.rule-example {
+  display: flex;
+  align-items: center;
   gap: 14px;
-  margin: 20px 0 22px;
-  padding-top: 18px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  opacity: 0;
-  animation: fadeSlideUp 0.4s ease 0.55s forwards;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  transition: background 0.2s ease;
 }
 
-.example-row {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 8px;
+.rule-example:hover {
+  background: rgba(255, 255, 255, 0.04);
 }
 
-.example-tiles {
+.rule-tiles {
   display: flex;
   gap: 4px;
+  flex-shrink: 0;
 }
 
-/* Smaller, self-contained tile styles so this file doesn't depend on
-   Board.css being loaded — mirrors the same visual language/colors. */
-.example-tiles .tile {
+.rule-tile {
   width: 34px;
   height: 34px;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 1rem;
+  font-size: 1.05rem;
   font-weight: 800;
   text-transform: uppercase;
-  border: 2px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.03);
   border-radius: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   color: #FFFFFF;
-  transition: transform 0.15s ease;
+  transition: all 0.2s ease;
 }
 
-.example-row:hover .tile {
-  transform: translateY(-1px);
-}
-
-.example-tiles .tile.correct {
-  background: linear-gradient(135deg, #00C9A7, #00A88A);
+.rule-tile.correct {
+  background: #00C9A7;
   border-color: #00C9A7;
-  box-shadow: 0 3px 12px rgba(0, 201, 167, 0.3);
+  box-shadow: 0 2px 12px rgba(0, 201, 167, 0.25);
 }
 
-.example-tiles .tile.present {
-  background: linear-gradient(135deg, #FFB347, #E69933);
+.rule-tile.present {
+  background: #FFB347;
   border-color: #FFB347;
-  box-shadow: 0 3px 12px rgba(255, 179, 71, 0.3);
+  box-shadow: 0 2px 12px rgba(255, 179, 71, 0.25);
 }
 
-.example-tiles .tile.absent {
-  background: linear-gradient(135deg, #787C7E, #5A5E60);
+.rule-tile.absent {
+  background: #787C7E;
   border-color: #787C7E;
-  opacity: 0.75;
+  opacity: 0.6;
 }
 
-.example-text {
+.rule-example p {
   margin: 0;
-  font-size: 0.8rem;
-  line-height: 1.4;
-  color: rgba(255, 255, 255, 0.6);
-  text-align: left;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.8);
 }
 
-.example-text strong {
+.rule-example p strong {
   color: #FFFFFF;
 }
 
-/* ---------- Button (shared naming with GameOverModal) ---------- */
-.button-group {
-  width: 100%;
-  opacity: 0;
-  animation: fadeSlideUp 0.4s ease 0.6s forwards;
+.rule-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 4px;
+  vertical-align: middle;
 }
 
-.restart-btn {
-  width: 100%;
-  padding: 14px 0;
-  border: none;
+.rule-dot.green {
+  background: #00C9A7;
+}
+
+.rule-dot.yellow {
+  background: #FFB347;
+}
+
+.rule-dot.gray {
+  background: #787C7E;
+}
+
+/* ========== TIPS ========== */
+.rule-tips {
+  margin: 14px 0 8px;
+  padding: 14px 18px;
+  background: rgba(255, 255, 255, 0.03);
   border-radius: 12px;
-  font-size: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rule-tip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.rule-tip .tip-icon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  width: 28px;
+  text-align: center;
+}
+
+.rule-tip strong {
+  color: #FFFFFF;
+}
+
+/* ========== PLAY BUTTON ========== */
+.rules-play-btn {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #00C9A7, #00A88A);
+  color: white;
+  font-size: 1.05rem;
   font-weight: 700;
-  letter-spacing: 0.01em;
-  color: #0D1210;
-  background: linear-gradient(135deg, #00E3B4, #00C9A7);
   cursor: pointer;
-  box-shadow: 0 6px 20px rgba(0, 201, 167, 0.3);
-  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  margin-top: 18px;
+  letter-spacing: 0.03em;
+  position: relative;
+  overflow: hidden;
 }
 
-.restart-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 26px rgba(0, 201, 167, 0.4);
-  filter: brightness(1.05);
+.rules-play-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.6s ease;
 }
 
-.restart-btn:active {
-  transform: translateY(0) scale(0.98);
-  box-shadow: 0 4px 14px rgba(0, 201, 167, 0.3);
+.rules-play-btn:hover::before {
+  left: 100%;
 }
 
-.restart-btn:focus-visible {
-  outline: 2px solid #00E3B4;
-  outline-offset: 3px;
+.rules-play-btn:hover {
+  transform: translateY(-3px) scale(1.01);
+  box-shadow: 0 8px 32px rgba(0, 201, 167, 0.35);
 }
 
-/* ---------- Responsive ---------- */
-@media (max-width: 400px) {
-  .modal {
-    padding: 28px 20px 22px;
-    max-width: 300px;
-    border-radius: 16px;
+.rules-play-btn:active {
+  transform: scale(0.97);
+  box-shadow: none;
+}
+
+/* ========== RESPONSIVE ========== */
+
+/* Tablet */
+@media (max-width: 540px) {
+  .rules-modal {
+    padding: 28px 24px 24px;
+    border-radius: 20px;
   }
-
-  .rules-emoji {
-    font-size: 2.4rem;
+  
+  .rules-modal h2 {
+    font-size: 1.5rem;
+    margin-bottom: 14px;
   }
-
-  .modal h2 {
-    font-size: 1.3rem;
+  
+  .rule-tile {
+    width: 30px;
+    height: 30px;
+    font-size: 0.9rem;
+    border-radius: 5px;
   }
-
-  .rules-list li {
+  
+  .rule-example {
+    gap: 10px;
+    padding: 6px 10px;
+  }
+  
+  .rule-example p {
     font-size: 0.8rem;
   }
-
-  .example-tiles .tile {
-    width: 28px;
-    height: 28px;
-    font-size: 0.85rem;
+  
+  .rules-content {
+    font-size: 0.9rem;
   }
-
-  .example-text {
-    font-size: 0.75rem;
-  }
-
-  .restart-btn {
-    padding: 12px 0;
+  
+  .rules-play-btn {
+    padding: 12px;
     font-size: 0.95rem;
+    border-radius: 12px;
   }
 }
 
-/* ---------- Reduced motion ---------- */
+/* Mobile */
+@media (max-width: 440px) {
+  .rules-overlay {
+    padding: 12px;
+  }
+  
+  .rules-modal {
+    padding: 20px 16px 18px;
+    border-radius: 16px;
+  }
+  
+  .rules-modal h2 {
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+  }
+  
+  .rules-close {
+    top: 10px;
+    right: 12px;
+    font-size: 1.1rem;
+  }
+  
+  .rule-tile {
+    width: 26px;
+    height: 26px;
+    font-size: 0.8rem;
+    border-radius: 4px;
+  }
+  
+  .rule-example {
+    gap: 8px;
+    padding: 5px 8px;
+    flex-wrap: wrap;
+  }
+  
+  .rule-example p {
+    font-size: 0.75rem;
+    width: 100%;
+    margin-left: 0;
+  }
+  
+  .rule-tips {
+    padding: 10px 12px;
+    gap: 6px;
+  }
+  
+  .rule-tip {
+    font-size: 0.75rem;
+    gap: 8px;
+  }
+  
+  .rule-tip .tip-icon {
+    font-size: 0.95rem;
+    width: 24px;
+  }
+  
+  .rules-content {
+    font-size: 0.85rem;
+  }
+  
+  .rules-intro {
+    font-size: 0.95rem;
+  }
+  
+  .rules-play-btn {
+    padding: 10px;
+    font-size: 0.85rem;
+    border-radius: 10px;
+    margin-top: 12px;
+  }
+}
+
+/* Small Mobile */
+@media (max-width: 360px) {
+  .rules-modal {
+    padding: 14px 12px 14px;
+    border-radius: 12px;
+  }
+  
+  .rules-modal h2 {
+    font-size: 1.1rem;
+  }
+  
+  .rule-tile {
+    width: 22px;
+    height: 22px;
+    font-size: 0.7rem;
+    border-radius: 3px;
+  }
+  
+  .rule-example p {
+    font-size: 0.7rem;
+  }
+  
+  .rule-tip {
+    font-size: 0.7rem;
+  }
+  
+  .rules-play-btn {
+    font-size: 0.8rem;
+    padding: 8px;
+  }
+}
+
+/* ========== REDUCED MOTION ========== */
 @media (prefers-reduced-motion: reduce) {
-  .modal-overlay,
-  .modal,
-  .rules-emoji,
-  .modal h2,
-  .subtitle,
-  .rules-list,
-  .rules-examples,
-  .button-group,
-  .example-tiles .tile,
-  .restart-btn {
+  .rules-overlay,
+  .rules-modal,
+  .rules-close,
+  .rules-play-btn {
     animation: none !important;
     transition: none !important;
-    opacity: 1 !important;
-    transform: none !important;
+  }
+  
+  .rules-play-btn::before {
+    display: none;
   }
 }

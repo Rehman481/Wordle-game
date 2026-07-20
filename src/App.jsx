@@ -17,13 +17,52 @@ function App() {
   const [keyStatuses, setKeyStatuses] = useState({})
   const [errorMessage, setErrorMessage] = useState('')
   const [shake, setShake] = useState(false)
+
+  // HINT SYSTEM STATE
+  const [hintUsed, setHintUsed] = useState(false)
+  const [hintLetter, setHintLetter] = useState('')
+  const [hintPosition, setHintPosition] = useState(-1)
+  const [hintRevealed, setHintRevealed] = useState(false)
+
+  // TIMER STATE - 2 MINUTES (120 seconds)
+  const [timeLeft, setTimeLeft] = useState(120)
+  const [timerActive, setTimerActive] = useState(false)
+  const [showRules, setShowRules] = useState(true)
   const [gameStarted, setGameStarted] = useState(false)
 
+  // Initialize game - DON'T start timer yet
   useEffect(() => {
     const randomWord = WORDS[Math.floor(Math.random() * WORDS.length)]
     setSolution(randomWord)
+    resetHintState()
+    setTimeLeft(120)
+    setTimerActive(false)
+    setGameStarted(false)
   }, [])
 
+  // Reset hint state
+  const resetHintState = () => {
+    setHintUsed(false)
+    setHintLetter('')
+    setHintPosition(-1)
+    setHintRevealed(false)
+  }
+
+  // Timer logic - ONLY runs when timerActive is true AND gameStarted is true
+  useEffect(() => {
+    if (timerActive && timeLeft > 0 && !gameOver && gameStarted) {
+      const timer = setTimeout(() => {
+        setTimeLeft(timeLeft - 1)
+      }, 1000)
+      return () => clearTimeout(timer)
+    } else if (timeLeft === 0 && !gameOver && gameStarted) {
+      setGameOver(true)
+      setTimerActive(false)
+      setErrorMessage('⏰ Time\'s Up!')
+    }
+  }, [timerActive, timeLeft, gameOver, gameStarted])
+
+  // Check win/lose
   useEffect(() => {
     if (guesses.length > 0) {
       const lastGuess = guesses[guesses.length - 1]
@@ -32,11 +71,92 @@ function App() {
       if (word === solution) {
         setWon(true)
         setGameOver(true)
+        setTimerActive(false)
       } else if (guesses.length === 6) {
         setGameOver(true)
+        setTimerActive(false)
       }
     }
   }, [guesses, solution])
+
+  // Reset game
+  const resetGame = () => {
+    const newWord = WORDS[Math.floor(Math.random() * WORDS.length)]
+    setSolution(newWord)
+    setGuesses([])
+    setCurrentGuess('')
+    setGameOver(false)
+    setWon(false)
+    setKeyStatuses({})
+    setErrorMessage('')
+    resetHintState()
+    setTimeLeft(120)
+    setTimerActive(false)
+    setGameStarted(false)
+    setShowRules(true)
+  }
+
+  // Start game when "Let's Play!" is clicked
+  const startGame = () => {
+    setShowRules(false)
+    setGameStarted(true)
+    setTimerActive(true)
+  }
+
+  // Find available hint position
+  const findHintPosition = () => {
+    const solutionArr = solution.split('')
+    
+    const correctPositions = new Set()
+    guesses.forEach(guess => {
+      guess.forEach((g, idx) => {
+        if (g.status === 'correct') {
+          correctPositions.add(idx)
+        }
+      })
+    })
+
+    const availablePositions = []
+    for (let i = 0; i < 5; i++) {
+      if (!correctPositions.has(i) && i !== hintPosition) {
+        let alreadyCorrect = false
+        guesses.forEach(guess => {
+          if (guess[i] && guess[i].letter === solutionArr[i] && guess[i].status === 'correct') {
+            alreadyCorrect = true
+          }
+        })
+        if (!alreadyCorrect) {
+          availablePositions.push(i)
+        }
+      }
+    }
+
+    if (availablePositions.length === 0) return -1
+    
+    const randomIndex = Math.floor(Math.random() * availablePositions.length)
+    return availablePositions[randomIndex]
+  }
+
+  // Handle hint usage
+  const handleHint = () => {
+    if (hintUsed || gameOver || guesses.length < 3) return
+    if (guesses.length >= 6) return
+
+    const position = findHintPosition()
+    if (position === -1) return
+
+    const letter = solution[position]
+    
+    let newGuess = currentGuess.padEnd(5, ' ').split('')
+    newGuess[position] = letter
+    newGuess = newGuess.join('').trimEnd()
+    
+    setHintLetter(letter)
+    setHintPosition(position)
+    setHintUsed(true)
+    setHintRevealed(true)
+    setCurrentGuess(newGuess)
+  }
 
   const evaluateGuess = (guess) => {
     const solutionArr = solution.split('')
@@ -87,8 +207,7 @@ function App() {
   }
 
   const handleKeyPress = useCallback((key) => {
-    if (!gameStarted || gameOver) return
-
+    if (gameOver || !gameStarted) return
     setErrorMessage('')
 
     if (key === 'ENTER') {
@@ -112,15 +231,46 @@ function App() {
     }
 
     if (key === 'BACK') {
-      setCurrentGuess(currentGuess.slice(0, -1))
+      const guessArray = currentGuess.split('')
+      let lastIndex = -1
+      for (let i = guessArray.length - 1; i >= 0; i--) {
+        if (i !== hintPosition) {
+          lastIndex = i
+          break
+        }
+      }
+      
+      if (lastIndex === -1) {
+        setCurrentGuess('')
+      } else {
+        const newGuess = guessArray.filter((_, idx) => idx !== lastIndex).join('')
+        setCurrentGuess(newGuess)
+      }
       return
     }
 
     if (currentGuess.length < 5 && key.match(/[A-Za-z]/)) {
-      setCurrentGuess(currentGuess + key.toUpperCase())
+      const upperKey = key.toUpperCase()
+      const guessArray = currentGuess.split('')
+      
+      let insertIndex = -1
+      for (let i = 0; i < 5; i++) {
+        if (i === hintPosition) continue
+        if (!guessArray[i] || guessArray[i] === ' ') {
+          insertIndex = i
+          break
+        }
+      }
+      
+      if (insertIndex === -1) return
+      
+      guessArray[insertIndex] = upperKey
+      const newGuess = guessArray.join('').trimEnd()
+      setCurrentGuess(newGuess)
     }
-  }, [currentGuess, gameOver, gameStarted])
+  }, [currentGuess, gameOver, hintPosition, gameStarted])
 
+  // Keyboard event listener
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Enter') {
@@ -144,15 +294,20 @@ function App() {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [handleKeyPress])
 
-  const resetGame = () => {
-    const newWord = WORDS[Math.floor(Math.random() * WORDS.length)]
-    setSolution(newWord)
-    setGuesses([])
-    setCurrentGuess('')
-    setGameOver(false)
-    setWon(false)
-    setKeyStatuses({})
-    setErrorMessage('')
+  const shouldShowHint = guesses.length >= 3 && !gameOver && !hintUsed && guesses.length < 6 && gameStarted
+
+  // Format timer (MM:SS)
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60)
+    const secs = seconds % 60
+    return `${mins}:${secs.toString().padStart(2, '0')}`
+  }
+
+  // Timer color based on time left
+  const getTimerColor = () => {
+    if (timeLeft <= 10) return 'timer-danger'
+    if (timeLeft <= 30) return 'timer-warning'
+    return ''
   }
 
   return (
@@ -161,41 +316,62 @@ function App() {
         <h1>Wordle</h1>
       </header>
 
-      {!gameStarted && (
-        <RulesModal onPlay={() => setGameStarted(true)} />
+      {/* Game Info: Timer + Rules Button */}
+      <div className="game-info">
+        <div className={`timer ${getTimerColor()}`}>
+          ⏱️ {formatTime(timeLeft)}
+        </div>
+        <button 
+          className="rules-btn"
+          onClick={() => setShowRules(true)}
+        >
+          📖 Rules
+        </button>
+      </div>
+
+      <GuessCounter guesses={guesses} error={!!errorMessage} />
+      
+      {errorMessage && (
+        <div className={`error-message ${shake ? 'shake' : ''}`}>
+          {errorMessage}
+        </div>
       )}
 
-      {gameStarted && (
-        <>
-          <GuessCounter guesses={guesses} error={!!errorMessage} />
+      <Board 
+        guesses={guesses}
+        currentGuess={currentGuess}
+        solution={solution}
+        gameOver={gameOver}
+        hintPosition={hintPosition}
+        hintLetter={hintLetter}
+        hintRevealed={hintRevealed}
+      />
 
-          {errorMessage && (
-            <div className={`error-message ${shake ? 'shake' : ''}`}>
-              {errorMessage}
-            </div>
-          )}
+      <Keyboard 
+        onKeyPress={handleKeyPress}
+        keyStatuses={keyStatuses}
+        gameOver={gameOver}
+        onHint={handleHint}
+        showHint={shouldShowHint}
+        hintUsed={hintUsed}
+      />
 
-          <Board 
-            guesses={guesses}
-            currentGuess={currentGuess}
-            solution={solution}
-            gameOver={gameOver}
-          />
+      {gameOver && (
+        <GameOverModal 
+          solution={solution}
+          won={won}
+          onRestart={resetGame}
+          timeLeft={timeLeft}
+        />
+      )}
 
-          <Keyboard 
-            onKeyPress={handleKeyPress}
-            keyStatuses={keyStatuses}
-            gameOver={gameOver}
-          />
-
-          {gameOver && (
-            <GameOverModal 
-              solution={solution}
-              won={won}
-              onRestart={resetGame}
-            />
-          )}
-        </>
+      {/* Rules Modal - shows on first load */}
+      {showRules && (
+        <RulesModal 
+          isOpen={showRules}
+          onClose={startGame}
+          onPlay={startGame}
+        />
       )}
     </div>
   )
