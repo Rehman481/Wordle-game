@@ -1,7 +1,7 @@
 // src/components/GameOverModal.jsx
 import './GameOverModal.css'
 
-const GameOverModal = ({ solution, won, onRestart }) => {
+const GameOverModal = ({ solution, won, onRestart, timeLeft }) => {
   return (
     <div className="modal-overlay">
       <div className="modal">
@@ -21,6 +21,12 @@ const GameOverModal = ({ solution, won, onRestart }) => {
             <span className="number">{won ? '✅' : '❌'}</span>
             <span className="label">Result</span>
           </div>
+          {timeLeft !== undefined && (
+            <div className="stat-item">
+              <span className="number">{timeLeft}s</span>
+              <span className="label">Time Left</span>
+            </div>
+          )}
         </div>
 
         <div className="button-group">

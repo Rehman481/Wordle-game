@@ -447,3 +447,60 @@
     display: none;
   }
 }
+/* src/components/RulesModal.css - Add theme support */
+
+.rules-modal {
+  background: var(--modal-bg);
+  border-color: var(--border-color);
+}
+
+.rules-modal h2 {
+  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.rules-content {
+  color: var(--text-secondary);
+}
+
+.rule-tile {
+  background: var(--tile-bg);
+  border-color: var(--tile-border);
+  color: var(--text-primary);
+}
+
+.rule-tips {
+  background: var(--bg-card);
+  border-color: var(--border-color);
+}
+
+.rule-tip {
+  color: var(--text-secondary);
+}
+
+.rule-tip strong {
+  color: var(--text-primary);
+}
+
+.rules-play-btn {
+  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+}
+
+.rules-play-btn:hover {
+  box-shadow: 0 4px 24px rgba(0, 201, 167, 0.3);
+}
+
+.rules-close {
+  color: var(--text-muted);
+}
+
+.rules-close:hover {
+  color: var(--text-primary);
+  background: var(--bg-card);
+}
+
+.rules-overlay {
+  background: rgba(0, 0, 0, 0.7);
+}

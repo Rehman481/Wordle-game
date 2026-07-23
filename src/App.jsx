@@ -1,4 +1,4 @@
-// src/App.jsx - WITH CONFETTI ON WIN
+// src/App.jsx - WITH DARK/LIGHT MODE TOGGLE
 import { useState, useEffect, useCallback } from 'react'
 import Board from './components/Board'
 import Keyboard from './components/Keyboard'
@@ -22,6 +22,28 @@ function App() {
   const [soundEnabled, setSoundEnabled] = useState(true)
   const [confettiTriggered, setConfettiTriggered] = useState(false)
 
+  // ========== THEME STATE ==========
+  const [darkMode, setDarkMode] = useState(() => {
+    // Check localStorage for saved preference
+    const saved = localStorage.getItem('wordleTheme')
+    if (saved) return saved === 'dark'
+    // Default to dark mode
+    return true
+  })
+
+  // ========== APPLY THEME ==========
+  useEffect(() => {
+    const root = document.documentElement
+    if (darkMode) {
+      root.classList.add('dark')
+      root.classList.remove('light')
+    } else {
+      root.classList.add('light')
+      root.classList.remove('dark')
+    }
+    localStorage.setItem('wordleTheme', darkMode ? 'dark' : 'light')
+  }, [darkMode])
+
   // HINT SYSTEM STATE
   const [hintUsed, setHintUsed] = useState(false)
   const [lockedHintIndex, setLockedHintIndex] = useState(-1)
@@ -38,7 +60,6 @@ function App() {
     if (confettiTriggered) return
     setConfettiTriggered(true)
 
-    // First burst - main celebration
     confetti({
       particleCount: 150,
       spread: 80,
@@ -47,7 +68,6 @@ function App() {
       colors: ['#00C9A7', '#FFB347', '#4FC3F7', '#FF6B6B', '#FFD93D', '#6C5CE7']
     })
 
-    // Second burst - after 200ms
     setTimeout(() => {
       confetti({
         particleCount: 100,
@@ -58,7 +78,6 @@ function App() {
       })
     }, 200)
 
-    // Third burst - after 400ms
     setTimeout(() => {
       confetti({
         particleCount: 100,
@@ -69,7 +88,6 @@ function App() {
       })
     }, 400)
 
-    // Fourth burst - after 600ms (cannons from both sides)
     setTimeout(() => {
       confetti({
         particleCount: 60,
@@ -87,7 +105,6 @@ function App() {
       })
     }, 600)
 
-    // Final burst - after 900ms (rainbow shower)
     setTimeout(() => {
       confetti({
         particleCount: 80,
@@ -98,15 +115,6 @@ function App() {
       })
     }, 900)
   }
-
-  // ========== CONFETTI ON RESIZE ==========
-  useEffect(() => {
-    const handleResize = () => {
-      // Reset confetti trigger on resize to prevent issues
-    }
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
 
   // Resume audio context on user interaction
   useEffect(() => {
@@ -173,7 +181,6 @@ function App() {
         setGameOver(true)
         setTimerActive(false)
         sound.win()
-        // 🎉 Trigger confetti celebration
         setTimeout(() => celebrate(), 300)
       } else if (guesses.length === 6) {
         setGameOver(true)
@@ -430,6 +437,10 @@ function App() {
     setSoundEnabled(enabled)
   }
 
+  const toggleTheme = () => {
+    setDarkMode(prev => !prev)
+  }
+
   return (
     <div className="app">
       <header className="app-header">
@@ -441,6 +452,9 @@ function App() {
           ⏱️ {formatTime(timeLeft)}
         </div>
         <div className="game-info-buttons">
+          <button className="theme-btn" onClick={toggleTheme} title="Toggle Theme">
+            {darkMode ? '☀️' : '🌙'}
+          </button>
           <button className="sound-btn" onClick={toggleSound}>
             {soundEnabled ? '🔊' : '🔇'}
           </button>

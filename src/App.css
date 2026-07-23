@@ -270,3 +270,300 @@ body {
     font-size: 0.85rem;
   }
 }
+/* src/App.css - DARK/LIGHT THEME STYLES */
+
+/* ========== CSS VARIABLES ========== */
+:root {
+  /* DARK MODE (Default) */
+  --bg-primary: #0F0E17;
+  --bg-secondary: #1A1D20;
+  --bg-card: rgba(255, 255, 255, 0.04);
+  --bg-card-hover: rgba(255, 255, 255, 0.08);
+  --text-primary: #FFFFFF;
+  --text-secondary: rgba(255, 255, 255, 0.7);
+  --text-muted: rgba(255, 255, 255, 0.4);
+  --border-color: rgba(255, 255, 255, 0.08);
+  --border-light: rgba(255, 255, 255, 0.15);
+  --shadow-color: rgba(0, 0, 0, 0.5);
+  --tile-bg: rgba(255, 255, 255, 0.03);
+  --tile-border: rgba(255, 255, 255, 0.08);
+  --key-bg: rgba(255, 255, 255, 0.06);
+  --key-hover: rgba(255, 255, 255, 0.12);
+  --modal-bg: #1A1D20;
+  --error-bg: rgba(255, 92, 92, 0.12);
+  --error-border: rgba(255, 92, 92, 0.35);
+  --error-text: #FF8A8A;
+  --timer-bg: rgba(255, 255, 255, 0.06);
+  --timer-border: rgba(255, 255, 255, 0.1);
+  --timer-text: #FFFFFF;
+  --hint-bg: rgba(79, 195, 247, 0.12);
+  --hint-border: rgba(79, 195, 247, 0.2);
+  --hint-text: #4FC3F7;
+  --correct: #00C9A7;
+  --present: #FFB347;
+  --absent: #787C7E;
+  --gradient-start: #00E3B4;
+  --gradient-end: #00C9A7;
+}
+
+/* ========== LIGHT MODE ========== */
+html.light {
+  --bg-primary: #F5F7FA;
+  --bg-secondary: #FFFFFF;
+  --bg-card: rgba(0, 0, 0, 0.03);
+  --bg-card-hover: rgba(0, 0, 0, 0.06);
+  --text-primary: #1A1A2E;
+  --text-secondary: rgba(0, 0, 0, 0.6);
+  --text-muted: rgba(0, 0, 0, 0.4);
+  --border-color: rgba(0, 0, 0, 0.08);
+  --border-light: rgba(0, 0, 0, 0.15);
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  --tile-bg: rgba(0, 0, 0, 0.02);
+  --tile-border: rgba(0, 0, 0, 0.1);
+  --key-bg: rgba(0, 0, 0, 0.06);
+  --key-hover: rgba(0, 0, 0, 0.1);
+  --modal-bg: #FFFFFF;
+  --error-bg: rgba(255, 92, 92, 0.08);
+  --error-border: rgba(255, 92, 92, 0.25);
+  --error-text: #D32F2F;
+  --timer-bg: rgba(0, 0, 0, 0.04);
+  --timer-border: rgba(0, 0, 0, 0.08);
+  --timer-text: #1A1A2E;
+  --hint-bg: rgba(79, 195, 247, 0.08);
+  --hint-border: rgba(79, 195, 247, 0.2);
+  --hint-text: #0288D1;
+}
+
+/* ========== APPLY VARIABLES ========== */
+html,
+body,
+#root {
+  background: var(--bg-primary);
+}
+
+.app {
+  background: var(--bg-secondary);
+  backdrop-filter: none;
+  box-shadow: 0 20px 60px var(--shadow-color);
+}
+
+.app-header h1 {
+  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end), var(--present));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ========== THEME TOGGLE BUTTON ========== */
+.theme-btn {
+  padding: 6px 10px;
+  border: none;
+  border-radius: 10px;
+  background: var(--key-bg);
+  color: var(--text-secondary);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  border: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+
+.theme-btn:hover {
+  background: var(--key-hover);
+  color: var(--text-primary);
+  transform: translateY(-1px);
+}
+
+.theme-btn:active {
+  transform: scale(0.95);
+}
+
+/* ========== TILE STYLES ========== */
+.tile {
+  border-color: var(--tile-border);
+  background: var(--tile-bg);
+  color: var(--text-primary);
+}
+
+.row.active .tile:not(:empty) {
+  border-color: var(--border-light);
+  background: var(--bg-card);
+}
+
+/* ========== KEYBOARD STYLES ========== */
+.key {
+  background: var(--key-bg);
+  color: var(--text-primary);
+  box-shadow: 0 1px 4px var(--shadow-color);
+}
+
+.key:hover:not(:disabled) {
+  background: var(--key-hover);
+}
+
+.key.special {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-muted);
+}
+
+.key.special:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+}
+
+.key.correct {
+  background: linear-gradient(135deg, var(--correct), #00A88A);
+  color: white;
+}
+
+.key.present {
+  background: linear-gradient(135deg, var(--present), #E69933);
+  color: white;
+}
+
+.key.absent {
+  background: var(--absent);
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* ========== TIMER STYLES ========== */
+.timer {
+  background: var(--timer-bg);
+  border-color: var(--timer-border);
+  color: var(--timer-text);
+}
+
+.timer-warning {
+  color: var(--present);
+  border-color: rgba(255, 179, 71, 0.3);
+  background: rgba(255, 179, 71, 0.08);
+}
+
+.timer-danger {
+  color: #FF5C5C;
+  border-color: rgba(255, 92, 92, 0.3);
+  background: rgba(255, 92, 92, 0.08);
+}
+
+/* ========== ERROR MESSAGE ========== */
+.error-message {
+  background: var(--error-bg);
+  border-color: var(--error-border);
+  color: var(--error-text);
+}
+
+/* ========== RULES BUTTON ========== */
+.rules-btn {
+  background: var(--key-bg);
+  color: var(--text-secondary);
+  border-color: var(--border-color);
+}
+
+.rules-btn:hover {
+  background: var(--key-hover);
+  color: var(--text-primary);
+}
+
+/* ========== GUESS COUNTER ========== */
+.guess-counter {
+  background: var(--bg-card);
+  border-color: var(--border-color);
+}
+
+.counter-label {
+  color: var(--text-secondary);
+}
+
+.dot.remaining {
+  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+  border-color: var(--correct);
+}
+
+/* ========== MODAL ========== */
+.modal {
+  background: var(--modal-bg);
+  border-color: var(--border-color);
+}
+
+.modal h2 {
+  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ========== HINT BUTTON ========== */
+.hint-btn {
+  background: var(--hint-bg);
+  color: var(--hint-text);
+  border-color: var(--hint-border);
+}
+
+.hint-btn:hover:not(:disabled) {
+  background: rgba(79, 195, 247, 0.2);
+}
+
+/* ========== SCROLLBAR ========== */
+::-webkit-scrollbar-thumb {
+  background: var(--text-muted);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
+/* ========== LIGHT MODE SPECIFIC ========== */
+html.light .key.special {
+  background: rgba(0, 0, 0, 0.04);
+  color: rgba(0, 0, 0, 0.4);
+}
+
+html.light .key.special:hover:not(:disabled) {
+  background: rgba(0, 0, 0, 0.08);
+  color: var(--text-primary);
+}
+
+html.light .timer-warning {
+  background: rgba(255, 179, 71, 0.08);
+}
+
+html.light .timer-danger {
+  background: rgba(255, 92, 92, 0.08);
+}
+
+html.light .dot.remaining {
+  background: linear-gradient(135deg, #00C9A7, #00A88A);
+  border-color: #00C9A7;
+}
+
+html.light .hint-btn {
+  background: rgba(79, 195, 247, 0.08);
+  color: #0288D1;
+  border-color: rgba(79, 195, 247, 0.2);
+}
+
+html.light .hint-btn:hover:not(:disabled) {
+  background: rgba(79, 195, 247, 0.15);
+}
+
+html.light .guess-counter {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+/* ========== TRANSITIONS ========== */
+.app,
+.tile,
+.key,
+.timer,
+.guess-counter,
+.modal,
+.error-message,
+.hint-btn,
+.theme-btn,
+.sound-btn,
+.rules-btn {
+  transition: background 0.3s ease, 
+              color 0.3s ease, 
+              border-color 0.3s ease, 
+              box-shadow 0.3s ease;
+}
