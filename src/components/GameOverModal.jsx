@@ -1,7 +1,10 @@
 // src/components/GameOverModal.jsx
 import './GameOverModal.css'
 
-const GameOverModal = ({ solution, won, onRestart, timeLeft }) => {
+const GameOverModal = ({ solution, won, onRestart, timeLeft, guesses }) => {
+  // Get the number of guesses used
+  const guessCount = guesses?.length || 0
+
   return (
     <div className="modal-overlay">
       <div className="modal">
@@ -14,7 +17,7 @@ const GameOverModal = ({ solution, won, onRestart, timeLeft }) => {
         
         <div className="stats">
           <div className="stat-item">
-            <span className="number">6</span>
+            <span className="number">{guessCount}</span>
             <span className="label">Attempts</span>
           </div>
           <div className="stat-item">
