@@ -1,10 +1,11 @@
-// src/App.jsx - WITH SOUND EFFECTS ADDED
+// src/App.jsx - WITH CONFETTI ON WIN
 import { useState, useEffect, useCallback } from 'react'
 import Board from './components/Board'
 import Keyboard from './components/Keyboard'
 import GameOverModal from './components/GameOverModal'
 import GuessCounter from './components/GuessCounter'
 import RulesModal from './components/RulesModal'
+import confetti from 'canvas-confetti'
 import sound from './utils/sounds'
 import { WORDS } from './data/words'
 import './App.css'
@@ -19,6 +20,7 @@ function App() {
   const [errorMessage, setErrorMessage] = useState('')
   const [shake, setShake] = useState(false)
   const [soundEnabled, setSoundEnabled] = useState(true)
+  const [confettiTriggered, setConfettiTriggered] = useState(false)
 
   // HINT SYSTEM STATE
   const [hintUsed, setHintUsed] = useState(false)
@@ -30,6 +32,81 @@ function App() {
   const [timerActive, setTimerActive] = useState(false)
   const [showRules, setShowRules] = useState(true)
   const [gameStarted, setGameStarted] = useState(false)
+
+  // ========== CONFETTI CELEBRATION ==========
+  const celebrate = () => {
+    if (confettiTriggered) return
+    setConfettiTriggered(true)
+
+    // First burst - main celebration
+    confetti({
+      particleCount: 150,
+      spread: 80,
+      origin: { y: 0.6 },
+      startVelocity: 35,
+      colors: ['#00C9A7', '#FFB347', '#4FC3F7', '#FF6B6B', '#FFD93D', '#6C5CE7']
+    })
+
+    // Second burst - after 200ms
+    setTimeout(() => {
+      confetti({
+        particleCount: 100,
+        spread: 60,
+        origin: { y: 0.5, x: 0.3 },
+        startVelocity: 30,
+        colors: ['#00E3B4', '#FF8A65', '#81D4FA', '#FFAB91']
+      })
+    }, 200)
+
+    // Third burst - after 400ms
+    setTimeout(() => {
+      confetti({
+        particleCount: 100,
+        spread: 60,
+        origin: { y: 0.5, x: 0.7 },
+        startVelocity: 30,
+        colors: ['#A8E6CF', '#FFD3B4', '#B39DDB', '#FF8A80']
+      })
+    }, 400)
+
+    // Fourth burst - after 600ms (cannons from both sides)
+    setTimeout(() => {
+      confetti({
+        particleCount: 60,
+        spread: 100,
+        origin: { y: 0.7, x: 0.1 },
+        startVelocity: 40,
+        colors: ['#FFD93D', '#FF6B6B', '#4FC3F7']
+      })
+      confetti({
+        particleCount: 60,
+        spread: 100,
+        origin: { y: 0.7, x: 0.9 },
+        startVelocity: 40,
+        colors: ['#FFD93D', '#FF6B6B', '#4FC3F7']
+      })
+    }, 600)
+
+    // Final burst - after 900ms (rainbow shower)
+    setTimeout(() => {
+      confetti({
+        particleCount: 80,
+        spread: 120,
+        origin: { y: 0.4 },
+        startVelocity: 25,
+        colors: ['#FF6B6B', '#FFD93D', '#6BCB77', '#4D96FF', '#9B59B6', '#FF8A65']
+      })
+    }, 900)
+  }
+
+  // ========== CONFETTI ON RESIZE ==========
+  useEffect(() => {
+    const handleResize = () => {
+      // Reset confetti trigger on resize to prevent issues
+    }
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   // Resume audio context on user interaction
   useEffect(() => {
@@ -52,6 +129,7 @@ function App() {
     setTimeLeft(120)
     setTimerActive(false)
     setGameStarted(false)
+    setConfettiTriggered(false)
   }, [])
 
   // Reset hint state
@@ -67,7 +145,6 @@ function App() {
       const timer = setTimeout(() => {
         setTimeLeft(prev => {
           const newTime = prev - 1
-          // Play timer warning sounds
           if (newTime <= 10 && newTime > 0) {
             sound.timerDanger()
           } else if (newTime <= 30 && newTime > 10 && newTime % 5 === 0) {
@@ -85,7 +162,7 @@ function App() {
     }
   }, [timerActive, timeLeft, gameOver, gameStarted])
 
-  // Check win/lose with sounds
+  // Check win/lose with confetti
   useEffect(() => {
     if (guesses.length > 0) {
       const lastGuess = guesses[guesses.length - 1]
@@ -96,6 +173,8 @@ function App() {
         setGameOver(true)
         setTimerActive(false)
         sound.win()
+        // 🎉 Trigger confetti celebration
+        setTimeout(() => celebrate(), 300)
       } else if (guesses.length === 6) {
         setGameOver(true)
         setTimerActive(false)
@@ -119,6 +198,7 @@ function App() {
     setTimerActive(false)
     setGameStarted(false)
     setShowRules(true)
+    setConfettiTriggered(false)
   }
 
   const startGame = () => {
@@ -239,7 +319,6 @@ function App() {
     return -1
   }
 
-  // ========== handleKeyPress with sounds ==========
   const handleKeyPress = useCallback((key) => {
     if (gameOver || !gameStarted) return
     setErrorMessage('')
@@ -261,7 +340,6 @@ function App() {
 
       const evaluated = evaluateGuess(guessWord)
       
-      // Play sounds based on evaluation
       evaluated.forEach(({ status }) => {
         if (status === 'correct') sound.correct()
         else if (status === 'present') sound.present()
