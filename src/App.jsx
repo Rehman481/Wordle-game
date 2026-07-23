@@ -1,10 +1,11 @@
-// src/App.jsx - COMPLETE FIXED VERSION
+// src/App.jsx - WITH SOUND EFFECTS ADDED
 import { useState, useEffect, useCallback } from 'react'
 import Board from './components/Board'
 import Keyboard from './components/Keyboard'
 import GameOverModal from './components/GameOverModal'
 import GuessCounter from './components/GuessCounter'
 import RulesModal from './components/RulesModal'
+import sound from './utils/sounds'
 import { WORDS } from './data/words'
 import './App.css'
 
@@ -17,6 +18,7 @@ function App() {
   const [keyStatuses, setKeyStatuses] = useState({})
   const [errorMessage, setErrorMessage] = useState('')
   const [shake, setShake] = useState(false)
+  const [soundEnabled, setSoundEnabled] = useState(true)
 
   // HINT SYSTEM STATE
   const [hintUsed, setHintUsed] = useState(false)
@@ -28,6 +30,19 @@ function App() {
   const [timerActive, setTimerActive] = useState(false)
   const [showRules, setShowRules] = useState(true)
   const [gameStarted, setGameStarted] = useState(false)
+
+  // Resume audio context on user interaction
+  useEffect(() => {
+    const resumeAudio = () => {
+      sound.resume()
+    }
+    document.addEventListener('click', resumeAudio)
+    document.addEventListener('keydown', resumeAudio)
+    return () => {
+      document.removeEventListener('click', resumeAudio)
+      document.removeEventListener('keydown', resumeAudio)
+    }
+  }, [])
 
   // Initialize game
   useEffect(() => {
@@ -46,21 +61,31 @@ function App() {
     setLockedHintLetter('')
   }
 
-  // Timer logic
+  // Timer logic with sounds
   useEffect(() => {
     if (timerActive && timeLeft > 0 && !gameOver && gameStarted) {
       const timer = setTimeout(() => {
-        setTimeLeft(prev => prev - 1)
+        setTimeLeft(prev => {
+          const newTime = prev - 1
+          // Play timer warning sounds
+          if (newTime <= 10 && newTime > 0) {
+            sound.timerDanger()
+          } else if (newTime <= 30 && newTime > 10 && newTime % 5 === 0) {
+            sound.timerWarning()
+          }
+          return newTime
+        })
       }, 1000)
       return () => clearTimeout(timer)
     } else if (timeLeft === 0 && !gameOver && gameStarted) {
       setGameOver(true)
       setTimerActive(false)
       setErrorMessage('⏰ Time\'s Up!')
+      sound.lose()
     }
   }, [timerActive, timeLeft, gameOver, gameStarted])
 
-  // Check win/lose
+  // Check win/lose with sounds
   useEffect(() => {
     if (guesses.length > 0) {
       const lastGuess = guesses[guesses.length - 1]
@@ -70,9 +95,11 @@ function App() {
         setWon(true)
         setGameOver(true)
         setTimerActive(false)
+        sound.win()
       } else if (guesses.length === 6) {
         setGameOver(true)
         setTimerActive(false)
+        sound.lose()
       }
     }
   }, [guesses, solution])
@@ -98,6 +125,7 @@ function App() {
     setShowRules(false)
     setGameStarted(true)
     setTimerActive(true)
+    sound.resume()
   }
 
   // Find available hint position
@@ -134,7 +162,7 @@ function App() {
     return availablePositions[randomIndex]
   }
 
-  // Handle hint usage - SIMPLIFIED
+  // Handle hint usage with sound
   const handleHint = () => {
     if (hintUsed || gameOver || guesses.length < 3) return
     if (guesses.length >= 6) return
@@ -151,6 +179,7 @@ function App() {
     setLockedHintLetter(letter)
     setHintUsed(true)
     setCurrentGuess(guessArray)
+    sound.hint()
   }
 
   const evaluateGuess = (guess) => {
@@ -199,6 +228,7 @@ function App() {
   const triggerShake = () => {
     setShake(true)
     setTimeout(() => setShake(false), 500)
+    sound.error()
   }
 
   const getFirstEditableIndex = (guessArray) => {
@@ -209,7 +239,7 @@ function App() {
     return -1
   }
 
-  // ========== SIMPLIFIED handleKeyPress ==========
+  // ========== handleKeyPress with sounds ==========
   const handleKeyPress = useCallback((key) => {
     if (gameOver || !gameStarted) return
     setErrorMessage('')
@@ -230,6 +260,14 @@ function App() {
       }
 
       const evaluated = evaluateGuess(guessWord)
+      
+      // Play sounds based on evaluation
+      evaluated.forEach(({ status }) => {
+        if (status === 'correct') sound.correct()
+        else if (status === 'present') sound.present()
+        else if (status === 'absent') sound.absent()
+      })
+
       setGuesses(prev => [...prev, evaluated])
       updateKeyStatuses(evaluated)
       setCurrentGuess(Array(5).fill(''))
@@ -254,6 +292,7 @@ function App() {
 
       guessArray[removeIndex] = ''
       setCurrentGuess(guessArray)
+      sound.keyPress()
       return
     }
 
@@ -266,6 +305,7 @@ function App() {
 
       guessArray[insertIndex] = upperKey
       setCurrentGuess(guessArray)
+      sound.keyPress()
     }
   }, [currentGuess, gameOver, lockedHintIndex, gameStarted])
 
@@ -307,6 +347,11 @@ function App() {
     return ''
   }
 
+  const toggleSound = () => {
+    const enabled = sound.toggle()
+    setSoundEnabled(enabled)
+  }
+
   return (
     <div className="app">
       <header className="app-header">
@@ -317,9 +362,14 @@ function App() {
         <div className={`timer ${getTimerColor()}`}>
           ⏱️ {formatTime(timeLeft)}
         </div>
-        <button className="rules-btn" onClick={() => setShowRules(true)}>
-          📖 Rules
-        </button>
+        <div className="game-info-buttons">
+          <button className="sound-btn" onClick={toggleSound}>
+            {soundEnabled ? '🔊' : '🔇'}
+          </button>
+          <button className="rules-btn" onClick={() => setShowRules(true)}>
+            📖 Rules
+          </button>
+        </div>
       </div>
 
       <GuessCounter guesses={guesses} error={!!errorMessage} />

@@ -233,3 +233,40 @@ body {
     transform: translateY(0);
   }
 }
+/* src/App.css - Add sound button styles */
+
+.game-info-buttons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.sound-btn {
+  padding: 6px 10px;
+  border: none;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+}
+
+.sound-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #FFFFFF;
+  transform: translateY(-1px);
+}
+
+.sound-btn:active {
+  transform: scale(0.95);
+}
+
+@media (max-width: 540px) {
+  .sound-btn {
+    padding: 4px 8px;
+    font-size: 0.85rem;
+  }
+}
